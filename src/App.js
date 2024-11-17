@@ -10,7 +10,6 @@ function App() {
     <Router>
       <Routes>
         <Route element={<PrivateComp />}>
-          {/* <Route path="/" element={<MainHome />} /> */}
           <Route path="/users" element={<Users />} />
         </Route>
         <Route path="/" element={<Login />} />
