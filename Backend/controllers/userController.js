@@ -1,14 +1,31 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const Role = require("../models/Role");
 
 // Create a new user
 exports.createUser = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, roleName } = req.body;
+
   try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already used." });
+    }
+
+    const role =
+      (await Role.findOne({ name: roleName })) ||
+      (await Role.findOne({ name: "user" }));
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashedPassword, role });
+
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role: role._id,
+    });
     await user.save();
-    res.status(201).json(user);
+    res.status(201).json({ message: "User added successfully", user });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
